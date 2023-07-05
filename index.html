@@ -13,6 +13,7 @@
 					background-size: cover;
 					background-repeat: no-repeat;
 					background-position: center;
+					overflow: hidden;
 				}
 				.back{
 				    position: absolute;
@@ -24,6 +25,54 @@
 				    border-radius: 0.5vh;
 				    left: 0.25vh;
 				    top: 0.25vh;
+				}
+				.awork{
+					display: none;
+				}
+				.awork,.extra{
+				    position: absolute;
+				    z-index: 1000000;
+				    background: white;
+				    font-size: 1.25vh;
+				    font-family: sans-serif;
+				    padding: 0.25vh;
+				    border-radius: 0.5vh;
+				    left: 0.25vh;
+				    top: 0.25vh;
+				    margin-top: -2vh;
+				    margin-left: 3vh;
+				}
+				.extra{
+				    font-size: 2vh;
+				}
+				.awork1_0,
+				.awork2_0,
+				.awork3_0{
+					margin-left: -15vh;
+					margin-top: 2.5vh;
+					font-size: 2vh;
+				}
+				.awork1_0:hover,
+				.awork2_0:hover,
+				.awork3_0:hover,
+				.extra:hover,
+				.close:hover{
+					background-color: red;
+					cursor: pointer;
+				}
+				.extra_1{
+					left: 1vh;
+					bottom: 1vh;
+					top: auto;
+				    margin-top: -0vh;
+				    margin-left: 0vh;
+				}
+				.extra_2{
+					left: 14.5vh;
+					bottom: 1vh;
+					top: auto;
+				    margin-top: -0vh;
+				    margin-left: 0vh;
 				}
 				.popup{
     position: absolute;
@@ -37,6 +86,39 @@
     top: 0.25vh;
     width: 35vh;
     display: none;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 100vh;
+    padding: 2vh;
+    box-sizing: border-box;
+				}
+				.popup .close{
+    position: absolute;
+    width: 2.5vh;
+    right: 0;
+    top: 0;
+    background: white;
+    border-radius: 50%;
+    transform: translate(30%, -30%);
+    padding: 0.5vh;
+    border: 1px solid #a6a5a5;
+}
+    .dropdown {
+      margin-bottom: 10px;
+      right: 1vh;
+      top: 1vh;
+      position: absolute;
+      z-index: 100000000;
+    }
+    .dropdown select{
+    	padding: 0.1vh;
+    }
+    .dropdown * {
+    font-size: 2vh;
+}
+				div{
+					position: absolute;
 				}
 		</style>
 	</head>
@@ -67,9 +149,14 @@ var scope_pivot_1 = new THREE.Group()
 var scope_pivot_2 = new THREE.Group()
 var scope_pivot_3 = new THREE.Group()
 var clickable = []
+var clickable_mat = []
 var clicked = false
 var clicked_target
 var lookat_pos = [0,0,0]
+
+var awork1,awork1_1,awork1_2,awork1_3,awork1_4,awork1_5
+var awork2,awork2_1,awork2_2,awork2_3,awork2_4,awork2_5
+var awork3,awork3_1,awork3_2,awork3_3,awork3_4,awork3_5
 
 var counter = 1
 
@@ -83,13 +170,15 @@ function degreesToRadians(degrees) {
 	const radians = degrees * Math.PI / 180;
 	return radians;
 }
+const sweepObjects = [];
 const pathObjects = [];
 const nullObjects = [];
 
 var null_pos = [ [ [ 985.4308471679688, 100, 1503.3370361328125 ] ], [ [ -1314.1064453125, 0, 887.3046875 ] ], [ [ 217.06353759765625, -150, 53.24908447265625 ], [ 217.06353759765625, -150, 28.24908447265625 ], [ 217.06353759765625, -150, 3.24908447265625 ], [ 217.06353759765625, -150, -21.75091552734375 ], [ 217.06353759765625, -150, -46.75091552734375 ] ], [ [ 1783.66552734375, -150, 641.1002197265625 ] ], [ [ -621.67822265625, 100, -663.185302734375 ] ], [ [ -1314.1064453125, 0, 629.5208740234375 ] ], [ [ 150.1352996826172, 100, -592.0118408203125 ] ], [ [ 1783.66552734375, -88.08936309814453, 691.1002197265625 ] ], [ [ -103.00930786132812, 100, 1217.4127197265625 ] ], [ [ -529.9364624023438, -73.52481842041016, 29.24908447265625 ] ], [ [ 216.54273986816406, 100, 1251.0587158203125 ] ], [ [ -471.3650207519531, -200, 45.91575241088867 ] ], [ [ -768.1920776367188, -200, 112.23155212402344 ] ], [ [ 296.9906921386719, 100, 797.8413696289062 ] ], [ [ -825.3349609375, -200, 499.2315368652344 ] ], [ [ 159.39987182617188, 100, 764.8206787109375 ] ], [ [ -904.8951416015625, -280.9115295410156, 471.3982238769531 ] ], [ [ -917.7522583007812, -130.91151428222656, 363.06488037109375 ], [ -917.7522583007812, -130.91151428222656, 404.56488037109375 ] ], [ [ -214.8650360107422, -200, -469.1017761230469 ] ], [ [ 902.5452270507812, -67.79586029052734, 642.6690673828125 ], [ 883.9319458007812, 50, 660.7490844726562 ], [ 883.9319458007812, -75, 460.74908447265625 ], [ 883.9319458007812, 50, 460.74908447265625 ] ], [ [ 271.9718322753906, 100, -329.46173095703125 ] ], [ [ 765.5635375976562, -75, 263.74908447265625 ], [ 565.5635375976562, -75, 263.74908447265625 ], [ 765.5635375976562, 50, 263.74908447265625 ], [ 565.5635375976562, 50, 263.74908447265625 ] ], [ [ 1154.0946044921875, 100, 1035.59130859375 ] ], [ [ -601.109375, -200, 820.2666015625 ] ], [ [ 683.9319458007812, -200, 594.0823974609375 ] ], [ [ 1339.6627197265625, 100, 1073.07470703125 ] ], [ [ 1240.247802734375, -200, -10.935115814208984 ] ], [ [ 1288.7364501953125, -200, 232.06488037109375 ] ], [ [ 561.8262329101562, 100, 888.3450927734375 ] ], [ [ 1670.787841796875, 100, 145.20448303222656 ] ], [ [ -1637.63330078125, 0, 817.3046875 ] ], [ [ 1325.523193359375, 100, 1704.140869140625 ] ], [ [ 897.390625, -200, -10.935115814208984 ] ], [ [ 1598.4959716796875, -200, 619.18115234375 ] ], [ [ 605.7747802734375, 100, 1207.0521240234375 ] ], [ [ 1495.7718505859375, -200, 610.0648803710938 ] ], [ [ 1792.5875244140625, 100, 382.86297607421875 ] ], [ [ 1128.67626953125, -200, 610.0648803710938 ] ], [ [ 309.8492431640625, -200, 1051.06494140625 ] ], [ [ 1071.87939453125, -200, 439.06488037109375 ] ], [ [ -744.2522583007812, 100, -159.06671142578125 ] ], [ [ 1091.920654296875, 100, -488.75091552734375 ] ], [ [ 1624.38037109375, 100, 61.01438522338867 ] ], [ [ -547.7140502929688, -200, -900.627685546875 ] ], [], [ [ -157.72216796875, -361.8230285644531, -698.6422119140625 ] ], [ [ 1804.572265625, 100, -176.32041931152344 ] ], [ [ -882.477783203125, -200, -265.7684631347656 ] ], [ [ 737.77783203125, 100, -326.75091552734375 ] ], [ [ -502.74334716796875, 100, -343.01611328125 ] ], [ [ 1339.6627197265625, 100, 1350.74609375 ] ], [ [ -1561.4693603515625, -200, 1485.2105712890625 ] ], [ [ -1530.2064208984375, 0, 1642.978759765625 ] ], [ [ 464.8185729980469, -13.41308307647705, 1010.7490844726562 ] ], [ [ 946.0247192382812, -80, -359.7606201171875 ], [ 895.061279296875, 43.03657913208008, -359.7606201171875 ], [ 838.6116333007812, 80.75503540039062, -359.7606201171875 ] ], [ [ 1857.6427001953125, 100, 145.20448303222656 ] ], [ [ 1320.6151123046875, 100, 139.6256866455078 ] ], [ [ 266.4971923828125, -85, -231.83505249023438 ] ], [ [ -1504.326416015625, -200, 1791.0313720703125 ] ], [ [ -1311.082275390625, 125, 1749.8564453125 ] ], [], [ [ -904.2952880859375, -140, -637.32275390625 ] ], [ [ -740.0872192382812, -140, 1601.7255859375 ] ], [ [ -794.6903076171875, -200, 1436.2886962890625 ] ], [ [ -569.88671875, -200, -1345.6455078125 ] ], [ [ -127.15904998779297, -507.7980041503906, -256.0963439941406 ] ], [ [ -214.54498291015625, -507.7980041503906, -247.5260772705078 ] ], [ [ 1935.88232421875, -21.36153793334961, -205.75091552734375 ] ], [ [ 852.9541015625, 100, 902.2579345703125 ] ], [ [ 818.1665649414062, 100, 1263.3629150390625 ] ], [ [ 463.06353759765625, 11, 64.24908447265625 ] ], [ [ 2013.64501953125, 100, 1332.278564453125 ] ], [ [ -922.8442993164062, 0, -860.9743041992188 ] ], [ [ -1107.201904296875, -21, 705.9190063476562 ] ], [ [ 670.0635375976562, 43, 118.24908447265625 ] ], [ [ 733.3612060546875, 100, 1140.385498046875 ] ], [ [ -1893.1744384765625, 0, 1207.049072265625 ] ], [ [ 1582.898193359375, 100, 58.72988510131836 ] ], [ [ -49.936458587646484, 75, -656.7258911132812 ] ], [ [ -43.936458587646484, -150, 829.2490844726562 ] ], [ [ 847.3597412109375, 100, 778.5206298828125 ] ], [ [ 491.9874572753906, 100, 471.0123596191406 ] ], [ [ 244.06353759765625, -150, 863.2490844726562 ] ], [ [ 311.4017028808594, 100, 594.455322265625 ] ], [ [ 487.06353759765625, -150, 825.2490844726562 ] ] ]
 var null_pos_under = [ [ [ [ 156.22833251953125, 0, 0 ] ] ], [ [ [ 157.65286254882812, 0, 0 ] ] ], [ [ [ 620, 0, 0 ] ], [ [ 620, 0, 0 ] ], [ [ 620, 0, 0 ] ], [ [ 620, 0, 0 ] ], [ [ 620, 0, 0 ] ] ], [ [ [ 215.33074951171875, 0, 0 ] ] ], [ [ [ 103.28883361816406, 0, 0 ] ] ], [ [ [ 486.5271911621094, 0, 0 ] ] ], [ [ [ 153.02049255371094, 0, 0 ] ] ], [ [ [ 111.51055908203125, 0, 0 ] ] ], [ [ [ 90.74046325683594, 0, 0 ] ] ], [ [ [ 296.07977294921875, 0, 0 ] ] ], [ [ [ 48.75941848754883, 0, 0 ] ] ], [ [ [ 115.35575103759766, 0, 0 ] ] ], [ [ [ 196.79751586914062, 0, 0 ] ] ], [ [ [ 91.32345581054688, 0, 0 ] ] ], [ [ [ 191.33091735839844, 0, 0 ] ] ], [ [ [ 48.705841064453125, 0, 0 ] ] ], [ [ [ 158.3056182861328, 0, 0 ] ] ], [ [ [ 866, 0, 0 ] ], [ [ 866, 0, 0 ] ] ], [ [ [ 431.1921081542969, 0, 0 ] ] ], [ [ [ 443.6004943847656, 0, 0 ] ], [ [ 443.60101318359375, 0, 0 ] ], [ [ 443.60101318359375, 0, 0 ] ], [ [ 443.60101318359375, 0, 0 ] ] ], [ [ [ 49.72054672241211, 0, 0 ] ] ], [ [ [ 432.5857849121094, 0, 0 ] ], [ [ 432.5857849121094, 0, 0 ] ], [ [ 432.5857849121094, 0, 0 ] ], [ [ 432.5857849121094, 0, 0 ] ] ], [ [ [ 43.01638412475586, 0, 0 ] ] ], [ [ [ 188.2549285888672, 0, 0 ] ] ], [ [ [ 448.60748291015625, 0, 0 ] ] ], [ [ [ 43.67817687988281, 0, 0 ] ] ], [ [ [ 172.2332305908203, 0, 0 ] ] ], [ [ [ 171.73104858398438, 0, 0 ] ] ], [ [ [ 43.45390319824219, 0, 0 ] ] ], [ [ [ 86.68875885009766, 0, 0 ] ] ], [ [ [ 156.22833251953125, 0, 0 ] ] ], [ [ [ 44.05841827392578, 0, 0 ] ] ], [ [ [ 169.2438507080078, 0, 0 ] ] ], [ [ [ 137.1993408203125, 0, 0 ] ] ], [ [ [ 51.839744567871094, 0, 0 ] ] ], [ [ [ 88.77603912353516, 0, 0 ] ] ], [ [ [ 42.79960632324219, 0, 0 ] ] ], [ [ [ 170.4903564453125, 0, 0 ] ] ], [ [ [ 193.44189453125, 0, 0 ] ] ], [ [ [ 169.6192169189453, 0, 2.901766777038574 ] ] ], [ [ [ 237.23484802246094, 0, 0 ] ] ], [ [ [ 522.124267578125, 0, 0 ] ] ], [ [ [ 85.59921264648438, 0, 0 ] ] ], [ [ [ 235.75970458984375, 0, 0 ] ] ], [], [ [ [ 657.6455078125, 0, 0 ] ] ], [ [ [ 86.85802459716797, 0, 0 ] ] ], [ [ [ 215.9306182861328, 0, 0 ] ] ], [ [ [ 522.2293701171875, 0, 0 ] ] ], [ [ [ 218.95982360839844, 0, 0 ] ] ], [ [ [ 167.6382598876953, 0, 0 ] ] ], [ [ [ 111.10449981689453, 0, 0 ] ] ], [ [ [ 158.84779357910156, 0, 0 ] ] ], [ [ [ 457.57781982421875, 0, 0 ] ] ], [ [ [ 672.9085693359375, 0.00002652926377777476, 0 ] ], [ [ 1199.35498046875, 0, 0 ] ], [ [ 0, 0, 0 ] ] ], [ [ [ 43.34437942504883, 0, 0 ] ] ], [ [ [ 133.82127380371094, 0, 0 ] ] ], [ [ [ 165.34324645996094, 0, 0 ] ] ], [ [ [ 109.3409423828125, 0, 0 ] ] ], [ [ [ 59.53801345825195, 0, 0 ] ] ], [], [ [ [ 163.47691345214844, 0, 0 ] ] ], [ [ [ 242.84100341796875, 0, 0 ] ] ], [ [ [ 78.75924682617188, 0, 0 ] ] ], [ [ [ 78.75924682617188, 0, 0 ] ] ], [ [ [ 1199.35498046875, 0, 0 ] ] ], [ [ [ 1199.3548583984375, 0, 0 ] ] ], [ [ [ 111.51055908203125, 0, 0 ] ] ], [ [ [ 88.8559799194336, 0, 0 ] ] ], [ [ [ 155.35064697265625, 0, 0 ] ] ], [ [ [ 146.11729431152344, 0, 0 ] ] ], [ [ [ 86.68875885009766, 0, 0 ] ] ], [ [ [ 158.3056182861328, 0, 0 ] ] ], [ [ [ 107.66537475585938, 0, 0 ] ] ], [ [ [ 73.05864715576172, 0, 0 ] ] ], [ [ [ 105.26329040527344, 0, 0 ] ] ], [ [ [ 157.3514862060547, 0, 0 ] ] ], [ [ [ 81.59834289550781, 0, 0 ] ] ], [ [ [ 342.2220764160156, 0, 0 ] ] ], [ [ [ 73.05864715576172, 0, 0 ] ] ], [ [ [ 87.94286346435547, 0, 0 ] ] ], [ [ [ 87.94286346435547, 0, 0 ] ] ], [ [ [ 73.05864715576172, 0, 0 ] ] ], [ [ [ 86.3724594116211, 0, 0 ] ] ], [ [ [ 76.90383911132812, 0, 0 ] ] ] ]
-var path_rot = [
-    [ -3.141592653589793, 0.7878727063068334, -3.141592653589793], [ 3.141592653589793, -0.000008972483556255946, 3.141592653589793], [ 3.141592653589793, -0.000008972483556255946, 3.141592653589793], [ 0, -0.5178801403556119, 0], [ 3.141592653589793, -0.6303189402889601, 3.141592653589793], [ 0, -0.5178801403556119, 0], [ 3.141592653589793, -0.6303189402889601, 3.141592653589793], [ 0, -0.5178801403556119, 0], [ 0, -0.7795665435118277, 0], [ 0, -0.5178801403556119, 0], [ 0, -0.7795665435118277, 0], [ 0, -0.5178801403556119, 0], [ 0, -0.5178801403556119, 0], [ 0, -0.7795665435118277, 0], [ 0, -0.5178801403556119, 0], [ 0, -0.7795665435118277, 0], [ 0, -0.7795665435118277, 0], [ 0, -0.5178801403556119, 0], [ 3.141592653589793, -1.0504469391607993, 3.141592653589793], [ 3.141592653589793, -1.0504469391607993, 3.141592653589793], [ 0, -0.7795665435118277, 0], [ 3.141592653589793, -1.0504469391607993, 3.141592653589793], [ 0, -0.7795665435118277, 0], [ 3.141592653589793, -1.0504469391607993, 3.141592653589793], [ 3.141592653589793, -1.0504469391607993, 3.141592653589793], [ 0, -0.7795665435118277, 0], [ 3.141592653589793, -1.0504469391607993, 3.141592653589793], [ 3.141592653589793, -1.0504469391607993, 3.141592653589793], [ 0, -0.7795665435118277, 0], [ 0, 0.6225011908735519, 0], [ 0, -0.7795665435118277, 0], [ -3.141592653589793, 0.7878727063068334, -3.141592653589793], [ 0, 0, 0], [ 0, 0, 0], [ 0, -0.7795665435118277, 0], [ 0, 0, 0], [ -3.141592653589793, 0.7878727063068334, -3.141592653589793], [ 0, 0, 0], [ 0, 0, 0], [ 0, 0, 0], [ 0, 0, 0], [ 0, 0, 0], [ -3.141592653589793, 0.7878727063068334, -3.141592653589793], [ 0, -0.5178801403556119, 0], [ 0, -0.38725261910568065, 0], [ 3.141592653589793, -1.0504469391607993, 3.141592653589793], [ 0, -0.38725261910568065, 0], [ 0, -0.5178801403556119, 0], [ 0, 0, 0], [ 0, -0.7795665435118277, 0], [ 0, -0.7795665435118277, 0], [ 0, -0.8918293418836186, 0], [ 0, -0.8918293418836186, 0], [ 3.141592653589793, -0.000008972483556255946, 3.141592653589793], [ 3.141592653589793, -0.000008972483556255946, 3.141592653589793], [ 0, 0.6225011908735519, 0], [ 0, 0, 0], [ 3.141592653589793, -0.000008972483556255946, 3.141592653589793], [ 0, -0.8918293418836186, 0], [ 0, -0.8918293418836186, 0], [ 0, -0.8918293418836186, 0], [ 0, -0.8918293418836186, 0], [ 0, -0.8918293418836186, 0], [ 0, -0.8918293418836186, 0], [ 0, -0.8918293418836186, 0], [ 0, 1.02791880911797, 0], [ -3.141592653589793, 1.110178354919063, -3.141592653589793], [ 3.141592653589793, -0.000008972483556255946, 3.141592653589793], [ 3.141592653589793, -0.6303189402889601, 3.141592653589793], [ 0, -0.7795665435118277, 0], [ 3.141592653589793, -0.000008972483556255946, 3.141592653589793], [ 3.141592653589793, -0.6303189402889601, 3.141592653589793], [ 0, -0.7795665435118277, 0], [ 3.141592653589793, -0.000008972483556255946, 3.141592653589793], [ 3.141592653589793, -0.000008972483556255946, 3.141592653589793], [ 3.141592653589793, -0.6303189402889601, 3.141592653589793], [ 0, -0.7795665435118277, 0], [ 0, 1.2513477767351147, 0], [ 3.141592653589793, -0.000008972483556255946, 3.141592653589793], [ 0, 1.0415802589196672, 0], [ 3.141592653589793, -0.6303189402889601, 3.141592653589793], [ 3.141592653589793, -0.6303189402889601, 3.141592653589793], [ 0, 1.0415802589196672, 0], [ 3.141592653589793, -0.6303189402889601, 3.141592653589793], [ 0, 1.0415802589196672, 0 ]]
+var path_rot = [[ -3.141592653589793, 0.7878727063068334, -3.141592653589793], [ 3.141592653589793, -0.000008972483556255946, 3.141592653589793], [ 3.141592653589793, -0.000008972483556255946, 3.141592653589793], [ 0, -0.5178801403556119, 0], [ 3.141592653589793, -0.6303189402889601, 3.141592653589793], [ 0, -0.5178801403556119, 0], [ 3.141592653589793, -0.6303189402889601, 3.141592653589793], [ 0, -0.5178801403556119, 0], [ 0, -0.7795665435118277, 0], [ 0, -0.5178801403556119, 0], [ 0, -0.7795665435118277, 0], [ 0, -0.5178801403556119, 0], [ 0, -0.5178801403556119, 0], [ 0, -0.7795665435118277, 0], [ 0, -0.5178801403556119, 0], [ 0, -0.7795665435118277, 0], [ 0, -0.7795665435118277, 0], [ 0, -0.5178801403556119, 0], [ 3.141592653589793, -1.0504469391607993, 3.141592653589793], [ 3.141592653589793, -1.0504469391607993, 3.141592653589793], [ 0, -0.7795665435118277, 0], [ 3.141592653589793, -1.0504469391607993, 3.141592653589793], [ 0, -0.7795665435118277, 0], [ 3.141592653589793, -1.0504469391607993, 3.141592653589793], [ 3.141592653589793, -1.0504469391607993, 3.141592653589793], [ 0, -0.7795665435118277, 0], [ 3.141592653589793, -1.0504469391607993, 3.141592653589793], [ 3.141592653589793, -1.0504469391607993, 3.141592653589793], [ 0, -0.7795665435118277, 0], [ 0, 0.6225011908735519, 0], [ 0, -0.7795665435118277, 0], [ -3.141592653589793, 0.7878727063068334, -3.141592653589793], [ 0, 0, 0], [ 0, 0, 0], [ 0, -0.7795665435118277, 0], [ 0, 0, 0], [ -3.141592653589793, 0.7878727063068334, -3.141592653589793], [ 0, 0, 0], [ 0, 0, 0], [ 0, 0, 0], [ 0, 0, 0], [ 0, 0, 0], [ -3.141592653589793, 0.7878727063068334, -3.141592653589793], [ 0, -0.5178801403556119, 0], [ 0, -0.38725261910568065, 0], [ 3.141592653589793, -1.0504469391607993, 3.141592653589793], [ 0, -0.38725261910568065, 0], [ 0, -0.5178801403556119, 0], [ 0, 0, 0], [ 0, -0.7795665435118277, 0], [ 0, -0.7795665435118277, 0], [ 0, -0.8918293418836186, 0], [ 0, -0.8918293418836186, 0], [ 3.141592653589793, -0.000008972483556255946, 3.141592653589793], [ 3.141592653589793, -0.000008972483556255946, 3.141592653589793], [ 0, 0.6225011908735519, 0], [ 0, 0, 0], [ 3.141592653589793, -0.000008972483556255946, 3.141592653589793], [ 0, -0.8918293418836186, 0], [ 0, -0.8918293418836186, 0], [ 0, -0.8918293418836186, 0], [ 0, -0.8918293418836186, 0], [ 0, -0.8918293418836186, 0], [ 0, -0.8918293418836186, 0], [ 0, -0.8918293418836186, 0], [ 0, 1.02791880911797, 0], [ -3.141592653589793, 1.110178354919063, -3.141592653589793], [ 3.141592653589793, -0.000008972483556255946, 3.141592653589793], [ 3.141592653589793, -0.6303189402889601, 3.141592653589793], [ 0, -0.7795665435118277, 0], [ 3.141592653589793, -0.000008972483556255946, 3.141592653589793], [ 3.141592653589793, -0.6303189402889601, 3.141592653589793], [ 0, -0.7795665435118277, 0], [ 3.141592653589793, -0.000008972483556255946, 3.141592653589793], [ 3.141592653589793, -0.000008972483556255946, 3.141592653589793], [ 3.141592653589793, -0.6303189402889601, 3.141592653589793], [ 0, -0.7795665435118277, 0], [ 0, 1.2513477767351147, 0], [ 3.141592653589793, -0.000008972483556255946, 3.141592653589793], [ 0, 1.0415802589196672, 0], [ 3.141592653589793, -0.6303189402889601, 3.141592653589793], [ 3.141592653589793, -0.6303189402889601, 3.141592653589793], [ 0, 1.0415802589196672, 0], [ 3.141592653589793, -0.6303189402889601, 3.141592653589793], [ 0, 1.0415802589196672, 0 ]]
+var init_rot = []
+var sweep_pos = []
 var index_null = 0
 var index_null_under = 0
 var index_null_under_under = 0
@@ -125,8 +214,6 @@ for (var i = material_array.length - 1; i >= 0; i--) {
             map: texture_array[i],     side: THREE.DoubleSide
          })
 }
-const material0 = new THREE.MeshBasicMaterial({color:0xffffff})
-
 const texture1 = new THREE.TextureLoader().load( "img/tex1-01.png" );
 texture1.wrapS = THREE.RepeatWrapping;
 texture1.wrapT = THREE.RepeatWrapping;
@@ -136,15 +223,6 @@ const material1 = new THREE.MeshBasicMaterial({
          })
 
 
-
-// loader.load(
-//     'before.gltf',
-//     function ( gltf ) {
-// 		inner_scene.scene.traverse( function( object ) {
-// 		    if ( object.name.includes( 'Cube' ) ) {
-// 		    }
-// 		})
-// 	}
 // )
 		    var rot_ar = []
 
@@ -156,13 +234,21 @@ loader.load(
         scene.add( gltf.scene );
 		inner_scene.scene.traverse( function( object ) {
 		    if ( object.name.includes( 'Sweep' ) ) {
-		    	console.log(object.position.z)
+		    	sweepObjects.push(object)
+		    	sweep_pos.push(Math.floor(Math.random()*100)-50)
 		    	if(object.material){
-		    		object.material = material0
+		    		object.material = new THREE.MeshBasicMaterial({color:0xffffff,opacity:0.1})
+		    		object.material.transparent = true
 		    	}
+				object.traverse( function( object_under ) {
+				    if ( object_under.name.includes( 'Mesh' ) ) {
+				    console.log('111')
+				    }
+				})
 		    }
 		    if ( object.name.includes( 'Path' ) ) {
 				    	rot_ar.push([object.rotation.x,object.rotation.y,object.rotation.z])
+				    	// console.log(rot_ar)
 				object.traverse( function( object_under ) {
 				    if ( object_under.name.includes( 'Null' ) ) {
 		    	
@@ -185,15 +271,16 @@ loader.load(
 				    	index_null_under++
 				    }
 				    if ( object_under.name.includes( 'Null_58_5' ) ) {
-				    	object_under.position.y = 101
+				    	// object_under.position.y = 101
 				    }
 				    if ( object_under.name.includes( 'Null_13' ) ) {
-				    	object_under.position.y = 100
+				    	// object_under.position.y = 100
 				    }
 				} );
 				object.rotation.y = 0
 				object.rotation.x = 0
 				object.rotation.z = 0
+				object.position.y = 0
 		        pathObjects.push( object );
 				index_null++
 				index_null_under = 0
@@ -206,119 +293,209 @@ loader.load(
         loader.load(
 		    'untitled3.gltf',
 		    function ( gltf ) {
-		    	console.log(gltf)
-		    	scope_1 = gltf.scene
-		    	scope_1.visible = false
-		    	scope_1.children[0].children[0].material = material_array[material_counter%(material_array.length-1)]
-		    	scope_1.children[0].children[1].material = material0
-		    	scope_1.children[0].children[0].name = 'scope_1_sat'
-		    	scope_1.children[0].children[0].remove()
-		    	material_counter++
-		    	scope_1.children[1].children[0].material = material_array[material_counter%(material_array.length-1)]
-		    	scope_1.children[1].children[1].material = material0
-		    	scope_1.children[1].children[0].name = 'scope_1_sat'
-		    	scope_1.children[1].children[0].remove()
-		    	material_counter++
-		    	scope_1.children[2].children[0].material = material_array[material_counter%(material_array.length-1)]
-		    	scope_1.children[2].children[1].material = material0
-		    	scope_1.children[2].children[0].name = 'scope_1_sat'
-		    	scope_1.children[2].children[0].remove()
-		    	material_counter++
-		    	scope_1.children[3].children[0].material = material_array[material_counter%(material_array.length-1)]
-		    	scope_1.children[3].children[1].material = material0
-		    	scope_1.children[3].children[0].name = 'scope_1_sat'
-		    	scope_1.children[3].children[0].remove()
-		    	material_counter++
-		    	scope_1.children[4].children[0].material = material_array[material_counter%(material_array.length-1)]
-		    	scope_1.children[4].children[1].material = material0
-		    	scope_1.children[4].children[0].name = 'scope_1_sat'
-		    	material_counter++
-		    	scope_1.position.x = -15
-		    	// scope_1.position.y = 15
-		    	// scope_1.position.z = -5
-		        scope_pivot_1.add( gltf.scene );
-	    	clickable.push(scope_1.children[0].children[0])
-	    	clickable.push(scope_1.children[1].children[0])
-	    	clickable.push(scope_1.children[2].children[0])
-	    	clickable.push(scope_1.children[3].children[0])
-	    	clickable.push(scope_1.children[4].children[0])
+		    	var innercounter = 0
+		    	console.log(gltf.scene.children[0])
+		    		gltf.scene.children[0].children[0].children[1].material = new THREE.MeshBasicMaterial({color:0xffffff,opacity:0.1})
+		    		gltf.scene.children[0].children[1].children[1].material = new THREE.MeshBasicMaterial({color:0xffffff,opacity:0.1})
+		    		gltf.scene.children[0].children[2].children[1].material = new THREE.MeshBasicMaterial({color:0xffffff,opacity:0.1})
+		    		gltf.scene.children[0].children[3].children[1].material = new THREE.MeshBasicMaterial({color:0xffffff,opacity:0.1})
+		    		gltf.scene.children[0].children[4].children[1].material = new THREE.MeshBasicMaterial({color:0xffffff,opacity:0.1})
+		    		gltf.scene.children[0].children[0].scale.set(0,0,0)
+					gltf.scene.children[0].children[1].scale.set(0,0,0)
+					gltf.scene.children[0].children[2].scale.set(0,0,0)
+					gltf.scene.children[0].children[3].scale.set(0,0,0)
+					gltf.scene.children[0].children[4].scale.set(0,0,0)
+		    		gltf.scene.visible = false
+		    		init_rot.push(gltf.scene.children[0].children[0].rotation.z)
+					init_rot.push(gltf.scene.children[0].children[1].rotation.z)
+					init_rot.push(gltf.scene.children[0].children[2].rotation.z)
+					init_rot.push(gltf.scene.children[0].children[3].rotation.z)
+					init_rot.push(gltf.scene.children[0].children[4].rotation.z)
+
+		    		gltf.scene.scale.set(9,9,9)
+		    		awork1 = gltf.scene.clone()
+		    		awork1.position.z = -15-7.5
+		    		awork1_1 = awork1.children[0].children[0].children[0]
+					awork1_2 = awork1.children[0].children[1].children[0]
+					awork1_3 = awork1.children[0].children[2].children[0]
+					awork1_4 = awork1.children[0].children[3].children[0]
+					awork1_5 = awork1.children[0].children[4].children[0]
+					clickable.push(awork1_1)
+					clickable.push(awork1_2)
+					clickable.push(awork1_3)
+					clickable.push(awork1_4)
+					clickable.push(awork1_5)
+					awork1_1.material = material_array[innercounter%material_array.length]
+					innercounter++
+					awork1_2.material = material_array[innercounter%material_array.length]
+					innercounter++
+					awork1_3.material = material_array[innercounter%material_array.length]
+					innercounter++
+					awork1_4.material = material_array[innercounter%material_array.length]
+					innercounter++
+					awork1_5.material = material_array[innercounter%material_array.length]
+					innercounter++
+					awork1.children[0].children[0].position.y = -50*(Math.random()+0.5)
+					awork1.children[0].children[1].position.y = -50*(Math.random()+0.5)
+					awork1.children[0].children[2].position.y = -50*(Math.random()+0.5)
+					awork1.children[0].children[3].position.y = -50*(Math.random()+0.5)
+					awork1.children[0].children[4].position.y = -50*(Math.random()+0.5)
+
+		    		awork2 = gltf.scene.clone()
+		    		awork2.position.z = 10-7.5
+		    		awork2_1 = awork2.children[0].children[0].children[0]
+					awork2_2 = awork2.children[0].children[1].children[0]
+					awork2_3 = awork2.children[0].children[2].children[0]
+					awork2_4 = awork2.children[0].children[3].children[0]
+					awork2_5 = awork2.children[0].children[4].children[0]
+					clickable.push(awork2_1)
+					clickable.push(awork2_2)
+					clickable.push(awork2_3)
+					clickable.push(awork2_4)
+					clickable.push(awork2_5)
+					awork2_1.material = material_array[innercounter%material_array.length]
+					innercounter++
+					awork2_2.material = material_array[innercounter%material_array.length]
+					innercounter++
+					awork2_3.material = material_array[innercounter%material_array.length]
+					innercounter++
+					awork2_4.material = material_array[innercounter%material_array.length]
+					innercounter++
+					awork2_5.material = material_array[innercounter%material_array.length]
+					innercounter++
+					awork2.children[0].children[0].position.y = -50*(Math.random()+0.5)
+					awork2.children[0].children[1].position.y = -50*(Math.random()+0.5)
+					awork2.children[0].children[2].position.y = -50*(Math.random()+0.5)
+					awork2.children[0].children[3].position.y = -50*(Math.random()+0.5)
+					awork2.children[0].children[4].position.y = -50*(Math.random()+0.5)
+					
+		    		awork3 = gltf.scene.clone()
+		    		awork3.position.z = 35-7.5
+		    		awork3_1 = awork3.children[0].children[0].children[0]
+					awork3_2 = awork3.children[0].children[1].children[0]
+					awork3_3 = awork3.children[0].children[2].children[0]
+					awork3_4 = awork3.children[0].children[3].children[0]
+					awork3_5 = awork3.children[0].children[4].children[0]
+					clickable.push(awork3_1)
+					clickable.push(awork3_2)
+					clickable.push(awork3_3)
+					clickable.push(awork3_4)
+					clickable.push(awork3_5)
+					console.log(material_array)
+					awork3_1.material = material_array[innercounter%material_array.length]
+					innercounter++
+					awork3_2.material = material_array[innercounter%material_array.length]
+					innercounter++
+					awork3_3.material = material_array[innercounter%material_array.length]
+					innercounter++
+					awork3_4.material = material_array[innercounter%material_array.length]
+					innercounter++
+					awork3_5.material = material_array[innercounter%material_array.length]
+					innercounter++
+					awork3.children[0].children[0].position.y = -50*(Math.random()+0.5)
+					awork3.children[0].children[1].position.y = -50*(Math.random()+0.5)
+					awork3.children[0].children[2].position.y = -50*(Math.random()+0.5)
+					awork3.children[0].children[3].position.y = -50*(Math.random()+0.5)
+					awork3.children[0].children[4].position.y = -50*(Math.random()+0.5)
+					
+		    	inner_scene.scene.add(awork1)
+		    	inner_scene.scene.add(awork2)
+		    	inner_scene.scene.add(awork3)
 		    }
 		);
 		loader.load(
 		    'untitled3.gltf',
 		    function ( gltf ) {
-		    	scope_2 = gltf.scene
-		    	scope_2.visible = false
-		    	scope_2.children[0].children[0].material = material_array[material_counter%(material_array.length-1)]
-		    	scope_2.children[0].children[1].material = material0
-		    	scope_2.children[0].children[0].name = 'scope_2_sat'
-		    	material_counter++
-		    	scope_2.children[1].children[0].material = material_array[material_counter%(material_array.length-1)]
-		    	scope_2.children[1].children[1].material = material0
-		    	scope_2.children[1].children[0].name = 'scope_2_sat'
-		    	material_counter++
-		    	scope_2.children[2].children[0].material = material_array[material_counter%(material_array.length-1)]
-		    	scope_2.children[2].children[1].material = material0
-		    	scope_2.children[2].children[0].name = 'scope_2_sat'
-		    	material_counter++
-		    	scope_2.children[3].children[0].material = material_array[material_counter%(material_array.length-1)]
-		    	scope_2.children[3].children[1].material = material0
-		    	scope_2.children[3].children[0].name = 'scope_2_sat'
-		    	material_counter++
-		    	scope_2.children[4].children[0].material = material_array[material_counter%(material_array.length-1)]
-		    	scope_2.children[4].children[1].material = material0
-		    	scope_2.children[4].children[0].name = 'scope_2_sat'
-		    	material_counter++
-		    	scope_2.position.x = -15
-		    	// scope_2.position.y = 15
-		    	// scope_2.position.z = 5
-		        scope_pivot_2.add( gltf.scene );
-	    	clickable.push(scope_2.children[0].children[0])
-	    	clickable.push(scope_2.children[1].children[0])
-	    	clickable.push(scope_2.children[2].children[0])
-	    	clickable.push(scope_2.children[3].children[0])
-	    	clickable.push(scope_2.children[4].children[0])
+		    // 	scope_2 = gltf.scene
+		    // 	scope_2.visible = false
+		    // 	scope_2.children[0].children[0].material = material_array[material_counter%(material_array.length-1)]
+		    // 	scope_2.children[0].children[1].material = material0
+		    // 	scope_2.children[0].children[0].name = 'scope_2_sat'
+		    // 	material_counter++
+		    // 	scope_2.children[1].children[0].material = material_array[material_counter%(material_array.length-1)]
+		    // 	scope_2.children[1].children[1].material = material0
+		    // 	scope_2.children[1].children[0].name = 'scope_2_sat'
+		    // 	material_counter++
+		    // 	scope_2.children[2].children[0].material = material_array[material_counter%(material_array.length-1)]
+		    // 	scope_2.children[2].children[1].material = material0
+		    // 	scope_2.children[2].children[0].name = 'scope_2_sat'
+		    // 	material_counter++
+		    // 	scope_2.children[3].children[0].material = material_array[material_counter%(material_array.length-1)]
+		    // 	scope_2.children[3].children[1].material = material0
+		    // 	scope_2.children[3].children[0].name = 'scope_2_sat'
+		    // 	material_counter++
+		    // 	scope_2.children[4].children[0].material = material_array[material_counter%(material_array.length-1)]
+		    // 	scope_2.children[4].children[1].material = material0
+		    // 	scope_2.children[4].children[0].name = 'scope_2_sat'
+		    // 	material_counter++
+		    // 	scope_2.position.x = -15
+		    // 	// scope_2.position.y = 15
+		    // 	// scope_2.position.z = 5
+		    //     scope_pivot_2.add( gltf.scene );
+	    	// clickable.push(scope_2.children[0].children[0])
+	    	// clickable.push(scope_2.children[1].children[0])
+	    	// clickable.push(scope_2.children[2].children[0])
+	    	// clickable.push(scope_2.children[3].children[0])
+	    	// clickable.push(scope_2.children[4].children[0])
 		    }
 		);
 		loader.load(
 		    'untitled3.gltf',
 		    function ( gltf ) {
-		    	scope_3 = gltf.scene
-		    	scope_3.visible = false
-		    	scope_3.position.x = -15
-		    	// scope_3.position.y = 15
-		    	// scope_3.position.z = 0
-		    	scope_3.children[0].children[0].material = material_array[material_counter%(material_array.length-1)]
-		    	scope_3.children[0].children[1].material = material0
-		    	scope_3.children[0].children[0].name = 'scope_3_sat'
-		    	material_counter++
-		    	scope_3.children[1].children[0].material = material_array[material_counter%(material_array.length-1)]
-		    	scope_3.children[1].children[1].material = material0
-		    	scope_3.children[1].children[0].name = 'scope_3_sat'
-		    	material_counter++
-		    	scope_3.children[2].children[0].material = material_array[material_counter%(material_array.length-1)]
-		    	scope_3.children[2].children[1].material = material0
-		    	scope_3.children[2].children[0].name = 'scope_3_sat'
-		    	material_counter++
-		    	scope_3.children[3].children[0].material = material_array[material_counter%(material_array.length-1)]
-		    	scope_3.children[3].children[1].material = material0
-		    	scope_3.children[3].children[0].name = 'scope_3_sat'
-		    	material_counter++
-		    	scope_3.children[4].children[0].material = material_array[material_counter%(material_array.length-1)]
-		    	scope_3.children[4].children[1].material = material0
-		    	scope_3.children[4].children[0].name = 'scope_3_sat'
-		    	material_counter++
-		        scope_pivot_3.add( gltf.scene );
-	    	clickable.push(scope_3.children[0].children[0])
-	    	clickable.push(scope_3.children[1].children[0])
-	    	clickable.push(scope_3.children[2].children[0])
-	    	clickable.push(scope_3.children[3].children[0])
-	    	clickable.push(scope_3.children[4].children[0])
+		    // 	scope_3 = gltf.scene
+		    // 	scope_3.visible = false
+		    // 	scope_3.position.x = -15
+		    // 	// scope_3.position.y = 15
+		    // 	// scope_3.position.z = 0
+		    // 	scope_3.children[0].children[0].material = material_array[material_counter%(material_array.length-1)]
+		    // 	scope_3.children[0].children[1].material = material0
+		    // 	scope_3.children[0].children[0].name = 'scope_3_sat'
+		    // 	material_counter++
+		    // 	scope_3.children[1].children[0].material = material_array[material_counter%(material_array.length-1)]
+		    // 	scope_3.children[1].children[1].material = material0
+		    // 	scope_3.children[1].children[0].name = 'scope_3_sat'
+		    // 	material_counter++
+		    // 	scope_3.children[2].children[0].material = material_array[material_counter%(material_array.length-1)]
+		    // 	scope_3.children[2].children[1].material = material0
+		    // 	scope_3.children[2].children[0].name = 'scope_3_sat'
+		    // 	material_counter++
+		    // 	scope_3.children[3].children[0].material = material_array[material_counter%(material_array.length-1)]
+		    // 	scope_3.children[3].children[1].material = material0
+		    // 	scope_3.children[3].children[0].name = 'scope_3_sat'
+		    // 	material_counter++
+		    // 	scope_3.children[4].children[0].material = material_array[material_counter%(material_array.length-1)]
+		    // 	scope_3.children[4].children[1].material = material0
+		    // 	scope_3.children[4].children[0].name = 'scope_3_sat'
+		    // 	material_counter++
+		    //     scope_pivot_3.add( gltf.scene );
+	    	// clickable.push(scope_3.children[0].children[0])
+	    	// clickable.push(scope_3.children[1].children[0])
+	    	// clickable.push(scope_3.children[2].children[0])
+	    	// clickable.push(scope_3.children[3].children[0])
+	    	// clickable.push(scope_3.children[4].children[0])
 		    }
 		);
     }
 );
+function toScreenPosition(obj, camera)
+{
+    var vector = new THREE.Vector3();
 
+    var widthHalf = 0.5*window.innerWidth;
+    var heightHalf = 0.5*window.innerHeight;
+    obj.updateMatrixWorld();
+    vector.setFromMatrixPosition(obj.matrixWorld);
+    vector.project(camera);
+
+    vector.x = ( vector.x * widthHalf ) + widthHalf;
+    vector.y = - ( vector.y * heightHalf ) + heightHalf;
+
+    return { 
+        x: vector.x,
+        y: vector.y
+    };
+
+};
 camera.position.z = 1.375;
 camera.fov =165;
 camera.updateProjectionMatrix();
@@ -328,169 +505,176 @@ var intersects
 
 
 function rotating_scene(outercounter,startcounter,duration){
-	// var counter = outercounter-startcounter
+	var value = ((outercounter-startcounter)/duration)
     	// var value = easeInOutCubic(counter/duration)
 
-	// var counter = outercounter-startcounter
-    	// inner_scene.scene.rotation.y = degToRad(30*value)
+    	inner_scene.scene.rotation.y = degToRad(70*value)
+    	// inner_scene.scene.position.x = -20*value
     	// inner_scene.scene.rotation.y = 0
 }
 function animating_cam1(outercounter,startcounter,duration){
 	var counter = outercounter-startcounter
-    	var value = easeInOutCubic(counter/duration)
-    	
-	var counter = outercounter-startcounter
-		camera.position.z = 1.375+value*10
-		camera.fov =165-(value*150);
+    var value = easeInOutCubic(counter/duration)
+    
+		camera.position.z = 2.5+value*410
+		camera.fov =105-(counter/duration*100);
 		camera.updateProjectionMatrix();
 }
-function animating_cam2(outercounter,startcounter,duration){
+function animating_circle(outercounter,startcounter,duration){
 	var counter = outercounter-startcounter
-    	var value = linear(counter/duration)
-    	
-	// var counter = outercounter-startcounter
-		// camera.position.z = 11.375+value*50
-		// camera.updateProjectionMatrix();
-}
-function animating_cam3(outercounter,startcounter,duration){
-	var counter = outercounter-startcounter
-    	var value = linear(counter/duration)
-    	
-	// var counter = outercounter-startcounter
-		// camera.position.z = 61.375+value*150
-		// camera.position.y = value*-50
-		// camera.lookAt(0,0,0)
-		// camera.updateProjectionMatrix();
-}
-// function animating_cam4(outercounter,startcounter,duration){
-// 	var counter = outercounter-startcounter
-//     	var value = easeInOutCubic(counter/duration)
-    	
-// 	var counter = outercounter-startcounter
-// 		camera.position.z = 81.375+value*100
-// 		camera.position.y = value*-8000
-// 		camera.lookAt(0,0,0)
-// 		camera.updateProjectionMatrix();
-// }
-function animating_elem(outercounter,startcounter,startindex,endindex,innerindex_null,innerindex_null_under){
-	var counter = outercounter-startcounter
-	var index_null_under=innerindex_null_under
-	var index_null=innerindex_null
-    var value = easeInOutCubic(counter/1000)
-	for (var i = startindex; i < endindex; i++) {
-			pathObjects[i].rotation.set(path_rot[i][0]*value,path_rot[i][1]*value,path_rot[i][2]*value)
-		// console.log(i)
-		if(pathObjects[i]){
-				pathObjects[i].traverse( function( object_under ) {
-				    if ( object_under.name.includes( 'Null' ) ) {
-				    	object_under.position.x = null_pos[index_null][index_null_under][0]-null_pos[index_null][index_null_under][0]*value
-				    	object_under.position.y = null_pos[index_null][index_null_under][1]-null_pos[index_null][index_null_under][1]*value
-				    	object_under.position.z = null_pos[index_null][index_null_under][2]-null_pos[index_null][index_null_under][2]*value
+    var value = easeOutQuint(counter/duration)
+    awork1.visible = true
+awork2.visible = true
+awork3.visible = true
+    	awork1.children[0].children[0].scale.set(value*1.0,value*1.0,value*1.0)
+    	awork1.children[0].children[1].scale.set(value*0.9,value*0.9,value*0.9)
+    	awork1.children[0].children[2].scale.set(value*0.8,value*0.8,value*0.8)
+    	awork1.children[0].children[3].scale.set(value*0.7,value*0.7,value*0.7)
+    	awork1.children[0].children[4].scale.set(value*0.6,value*0.6,value*0.6)
+    	awork2.children[0].children[0].scale.set(value*1.0,value*1.0,value*1.0)
+    	awork2.children[0].children[1].scale.set(value*0.9,value*0.9,value*0.9)
+    	awork2.children[0].children[2].scale.set(value*0.8,value*0.8,value*0.8)
+    	awork2.children[0].children[3].scale.set(value*0.7,value*0.7,value*0.7)
+    	awork3.children[0].children[4].scale.set(value*0.6,value*0.6,value*0.6)
+    	awork3.children[0].children[0].scale.set(value*1.0,value*1.0,value*1.0)
+    	awork3.children[0].children[1].scale.set(value*0.9,value*0.9,value*0.9)
+    	awork3.children[0].children[2].scale.set(value*0.8,value*0.8,value*0.8)
+    	awork3.children[0].children[3].scale.set(value*0.7,value*0.7,value*0.7)
+    	awork3.children[0].children[4].scale.set(value*0.6,value*0.6,value*0.6)
 		
-						object_under.traverse( function( object_under_under ) {
-						    if ( object_under_under.name.includes( 'Cube' ) ) {
-						    	object_under_under.position.x = null_pos_under[index_null][index_null_under][0][0]*value
-						    	object_under_under.position.y = null_pos_under[index_null][index_null_under][0][1]*value
-						    	object_under_under.position.z = null_pos_under[index_null][index_null_under][0][2]*value
-						    }
-						} );
-				    	index_null_under++
-				    }
-				});
-				index_null_under = 0
-				index_null++
-			}
-	}
 }
-    $('.back').click(function(){
+function animating_elem_single(outercounter,startcounter,startindex){
+	
+	var index_null_under=0
+	var index_null=startindex
+	var duration = 1500
+	var i = startindex
+		var counter = outercounter-(startcounter)
+		if(counter<0){
+			return false
+		}else if(counter<duration){
+	    	var value = counter/duration
+		if(sweepObjects[i]){
+			sweepObjects[i].position.y = (sweep_pos[i]*30)*value
+		}
+			pathObjects[i].rotation.set(path_rot[i][0]*value,path_rot[i][1]*value,path_rot[i][2]*value)
+			if(pathObjects[i]){
+					pathObjects[i].traverse( function( object_under ) {
+					    if ( object_under.name.includes( 'Null' ) ) {
+					    	object_under.position.x = null_pos[index_null][index_null_under][0]-null_pos[index_null][index_null_under][0]*value
+					    	object_under.position.y = null_pos[index_null][index_null_under][1]-null_pos[index_null][index_null_under][1]*value
+					    	object_under.position.z = null_pos[index_null][index_null_under][2]-null_pos[index_null][index_null_under][2]*value
+					    	object_under.rotation.y = degToRad(counter*(360/duration))
+			
+							object_under.traverse( function( object_under_under ) {
+							    if ( object_under_under.name.includes( 'Cube' ) ) {
+							    	object_under_under.position.x = null_pos_under[index_null][index_null_under][0][0]*value
+							    	object_under_under.position.y = null_pos_under[index_null][index_null_under][0][1]*value
+							    	object_under_under.position.z = null_pos_under[index_null][index_null_under][0][2]*value
+							    }
+							} );
+					    	index_null_under++
+					    }
+					});
+					index_null_under = 0
+				}
+		}else{
+			if(counter<3000){
+				if(sweepObjects[i].material){
+					// console.log(sweepObjects[i].material)
+			    		sweepObjects[i].material.opacity = Math.min(0.1+0.9*(counter-duration)/(3000-duration),1)
+			    }
+			}
+			if(pathObjects[i]){
+				pathObjects[i].traverse( function( object_under ) {
+					    if ( object_under.name.includes( 'Null' ) ) {
+					object_under.rotation.y = degToRad((counter-duration)/20)
+						}
+				})
+			}
+		}
+}
+    $('.close').click(function(){
     	$('.popup').fadeOut(300)
-        if(intersects.length>0){
-            clicked = true
-            clicked_target = 'back'
-        }
     })
+    $('.extra').click(function(){
+    	$('.popup').fadeIn(300)
+    })
+
 function animate() {
-	counter = counter+10
+	if(awork1){
+		$('.awork1_0').css({'left':toScreenPosition(awork1, camera).x + 'px'})
+		$('.awork1_1').css({'left':toScreenPosition(awork1_1, camera).x + 'px'})
+		$('.awork1_1').css({'top':toScreenPosition(awork1_1, camera).y + 'px'})
+		$('.awork1_2').css({'left':toScreenPosition(awork1_2, camera).x + 'px'})
+		$('.awork1_2').css({'top':toScreenPosition(awork1_2, camera).y + 'px'})
+		$('.awork1_3').css({'left':toScreenPosition(awork1_3, camera).x + 'px'})
+		$('.awork1_3').css({'top':toScreenPosition(awork1_3, camera).y + 'px'})
+		$('.awork1_4').css({'left':toScreenPosition(awork1_4, camera).x + 'px'})
+		$('.awork1_4').css({'top':toScreenPosition(awork1_4, camera).y + 'px'})
+		$('.awork1_5').css({'left':toScreenPosition(awork1_5, camera).x + 'px'})
+		$('.awork1_5').css({'top':toScreenPosition(awork1_5, camera).y + 'px'})
+		awork1.children[0].children[0].rotation.y = init_rot[0] + degToRad(counter/10*1.0)
+		awork1.children[0].children[1].rotation.y = init_rot[1] + degToRad(counter/10*1.05)
+		awork1.children[0].children[2].rotation.y = init_rot[2] - degToRad(counter/10*1.1)
+		awork1.children[0].children[3].rotation.y = init_rot[3] + degToRad(counter/10*1.15)
+		awork1.children[0].children[4].rotation.y = init_rot[4] - degToRad(counter/10*1.2)
+	}
+	if(awork2){
+		$('.awork2_0').css({'left':toScreenPosition(awork2, camera).x + 'px'})
+		$('.awork2_1').css({'left':toScreenPosition(awork2_1, camera).x + 'px'})
+		$('.awork2_1').css({'top':toScreenPosition(awork2_1, camera).y + 'px'})
+		$('.awork2_2').css({'left':toScreenPosition(awork2_2, camera).x + 'px'})
+		$('.awork2_2').css({'top':toScreenPosition(awork2_2, camera).y + 'px'})
+		$('.awork2_3').css({'left':toScreenPosition(awork2_3, camera).x + 'px'})
+		$('.awork2_3').css({'top':toScreenPosition(awork2_3, camera).y + 'px'})
+		$('.awork2_4').css({'left':toScreenPosition(awork2_4, camera).x + 'px'})
+		$('.awork2_4').css({'top':toScreenPosition(awork2_4, camera).y + 'px'})
+		$('.awork2_5').css({'left':toScreenPosition(awork2_5, camera).x + 'px'})
+		$('.awork2_5').css({'top':toScreenPosition(awork2_5, camera).y + 'px'})
+		awork2.children[0].children[0].rotation.y = init_rot[0] + degToRad(counter/10*1.0)
+		awork2.children[0].children[1].rotation.y = init_rot[1] + degToRad(counter/10*1.05)
+		awork2.children[0].children[2].rotation.y = init_rot[2] - degToRad(counter/10*1.1)
+		awork2.children[0].children[3].rotation.y = init_rot[3] + degToRad(counter/10*1.15)
+		awork2.children[0].children[4].rotation.y = init_rot[4] - degToRad(counter/10*1.2)
+	}
+	if(awork3){
+		$('.awork3_0').css({'left':toScreenPosition(awork3, camera).x + 'px'})
+		$('.awork3_1').css({'left':toScreenPosition(awork3_1, camera).x + 'px'})
+		$('.awork3_1').css({'top':toScreenPosition(awork3_1, camera).y + 'px'})
+		$('.awork3_2').css({'left':toScreenPosition(awork3_2, camera).x + 'px'})
+		$('.awork3_2').css({'top':toScreenPosition(awork3_2, camera).y + 'px'})
+		$('.awork3_3').css({'left':toScreenPosition(awork3_3, camera).x + 'px'})
+		$('.awork3_3').css({'top':toScreenPosition(awork3_3, camera).y + 'px'})
+		$('.awork3_4').css({'left':toScreenPosition(awork3_4, camera).x + 'px'})
+		$('.awork3_4').css({'top':toScreenPosition(awork3_4, camera).y + 'px'})
+		$('.awork3_5').css({'left':toScreenPosition(awork3_5, camera).x + 'px'})
+		$('.awork3_5').css({'top':toScreenPosition(awork3_5, camera).y + 'px'})
+		awork3.children[0].children[0].rotation.y = init_rot[0] + degToRad(counter/10*1.0)
+		awork3.children[0].children[1].rotation.y = init_rot[1] + degToRad(counter/10*1.05)
+		awork3.children[0].children[2].rotation.y = init_rot[2] - degToRad(counter/10*1.1)
+		awork3.children[0].children[3].rotation.y = init_rot[3] + degToRad(counter/10*1.15)
+		awork3.children[0].children[4].rotation.y = init_rot[4] - degToRad(counter/10*1.2)
+	}
+	counter = counter+5
 	scope_pivot_1.rotation.z = degToRad(340)
 	scope_pivot_2.rotation.z = degToRad(100)
 	scope_pivot_3.rotation.z = degToRad(220)
 	camera.lookAt(0,0,0)
-	if(scope_1){
-	    	scope_1.rotation.z = counter/1000
-	    	scope_1.children[0].rotation.y = counter/10000
-	    	scope_1.children[1].rotation.y = counter/20000
-	    	scope_1.children[2].rotation.y = counter/30000
-	    	scope_1.children[3].rotation.y = counter/40000
-	    	scope_1.children[4].rotation.y = counter/50000
-	    	scope_2.rotation.z = counter/1000
-	    	scope_2.children[0].rotation.y = counter/10000
-	    	scope_2.children[1].rotation.y = counter/20000
-	    	scope_2.children[2].rotation.y = counter/30000
-	    	scope_2.children[3].rotation.y = counter/40000
-	    	scope_2.children[4].rotation.y = counter/50000
-	    	scope_3.rotation.z = counter/1000
-	    	scope_3.children[0].rotation.y = counter/10000
-	    	scope_3.children[1].rotation.y = counter/20000
-	    	scope_3.children[2].rotation.y = counter/30000
-	    	scope_3.children[3].rotation.y = counter/40000
-	    	scope_3.children[4].rotation.y = counter/50000
-	    }
-
-    if(clicked){
-    	if(clicked_target=== 'back'){
-	    	camera.position.x=lerp(camera.position.x,0,0.05)
-	    	camera.position.y=lerp(camera.position.y,-49.93333333333334,0.05)
-	    	camera.position.z=lerp(camera.position.z,161.24166666666667,0.05)
-    	}else{
-    		console.log(clicked_target.object.name)
-	    	camera.position.x=lerp(camera.position.x,clicked_target.object.getWorldPosition( target ).x,0.05)
-	    	camera.position.y=lerp(camera.position.y,clicked_target.object.getWorldPosition( target ).y,0.05)
-	    	camera.position.z=lerp(camera.position.z,clicked_target.object.getWorldPosition( target ).z,0.05)
-	    	setTimeout(function(){
-	    		clicked_target.object.visible = false
-	    	},2000)
-	    	camera.lookAt(0,0,0)
-	    	camera.rotation.z = 0
-	    	inner_scene.scene.rotation.x = lerp(inner_scene.scene.rotation.x, degToRad(40), 0.05)
-    	}
-    	
-						    
-    }
     requestAnimationFrame( animate );
     renderer.render( scene, camera );
 
-    if(counter>0&&counter<3000){
-		// animating_cam1(counter,0,3000)
+    if(counter>0&&counter<8000){
+		animating_cam1(counter,0,8000)
     }
-    if(counter>3000&&counter<8000){
-		// animating_cam2(counter,3000,3000)
+    if(counter>4500&&counter<8000){
+		animating_circle(counter,4500,3500)
     }
     if(counter>6000&&counter<9000){
-		    	// // scope_1.visible = true
-		    	// scope_2.visible = true
-		    	// scope_3.visible = true
-		// animating_cam3(counter,6000,3000)
+		rotating_scene(counter,6000,3000)
     }
-    if(counter>1000&&counter<3000){
-		rotating_scene(counter,1000,2000)
-    }
-    if(counter>0&&counter<1000){
-    	animating_elem(counter,0,0,Math.floor((pathObjects.length - 1)/6),0,0)
-    }
-    if(counter>1000&&counter<2000){
-    	animating_elem(counter,1000,Math.floor((pathObjects.length - 1)/6)*1,Math.floor((pathObjects.length - 1)/6)*2,Math.floor((pathObjects.length - 1)/6),0)
-    }
-    if(counter>2000&&counter<3000){
-    	animating_elem(counter,2000,Math.floor((pathObjects.length - 1)/6)*2,Math.floor((pathObjects.length - 1)/6)*3,Math.floor((pathObjects.length - 1)/6)*2,0)
-    }
-    if(counter>3000&&counter<4000){
-    	animating_elem(counter,3000,Math.floor((pathObjects.length - 1)/6)*3,Math.floor((pathObjects.length - 1)/6)*4,Math.floor((pathObjects.length - 1)/6)*3,0)
-    }
-    if(counter>4000&&counter<5000){
-    	animating_elem(counter,4000,Math.floor((pathObjects.length - 1)/6)*4,Math.floor((pathObjects.length - 1)/6)*5,Math.floor((pathObjects.length - 1)/6)*4,0)
-    }
-    if(counter>5000&&counter<6000){
-    	animating_elem(counter,5000,Math.floor((pathObjects.length - 1)/6)*5,Math.floor((pathObjects.length - 1)/6)*6,Math.floor((pathObjects.length - 1)/6)*5,0)
+    for (var i = 0; i <  pathObjects.length; i++) {
+    animating_elem_single(counter,i*100+1000,i)
     }
 
     if(counter>1000){
@@ -501,55 +685,13 @@ function animate() {
 		    }
 		});
 	}}
-    if(counter>2000){
-	for (var i = 0; i < Math.floor((pathObjects.length - 1)/6)*2; i++) {
-		pathObjects[i].traverse( function( object_under ) {
-		    if ( object_under.name.includes( 'Null' ) ) {
-		    	object_under.rotation.y = degToRad((counter-2000)/20)
-		    }
-		});
-	}}
-    if(counter>3000){
-	for (var i = 0; i < Math.floor((pathObjects.length - 1)/6)*3; i++) {
-		pathObjects[i].traverse( function( object_under ) {
-		    if ( object_under.name.includes( 'Null' ) ) {
-		    	object_under.rotation.y = degToRad((counter-3000)/20)
-		    }
-		});
-	}}
-    if(counter>4000){
-	for (var i = 0; i < Math.floor((pathObjects.length - 1)/6)*4; i++) {
-		pathObjects[i].traverse( function( object_under ) {
-		    if ( object_under.name.includes( 'Null' ) ) {
-		    	object_under.rotation.y = degToRad((counter-4000)/20)
-		    }
-		});
-	}}
-    if(counter>5000 && counter<6000){
-	for (var i = 0; i < Math.floor((pathObjects.length - 1)/6)*5; i++) {
-		pathObjects[i].traverse( function( object_under ) {
-		    if ( object_under.name.includes( 'Null' ) ) {
-		    	object_under.rotation.y = degToRad((counter-5000)/20)
-		    }
-		});
-	}}
-    if(counter>6000){
-		for (var i = 0; i < Math.floor((pathObjects.length - 1)/6)*6; i++) {
-			pathObjects[i].traverse( function( object_under ) {
-			    if ( object_under.name.includes( 'Null' ) ) {
-			    	object_under.rotation.y = degToRad(counter/20)
-			    }
-			});
-		}
-	}
-
-
-
 	raycaster.setFromCamera( pointer, camera );
 	intersects = raycaster.intersectObjects( clickable );
         for (var i = clickable.length - 1; i >= 0; i--) {
             clickable[i].material.color.set( 0xffffff );
         }
+        if(counter>8000){
+		$('.awork').fadeIn(300)}
 	if(counter>10000){
 		for ( let i = 0; i < intersects.length; i ++ ) {
 			intersects[ i ].object.material.color.set( 0xff0000 );
@@ -561,7 +703,7 @@ function degToRad(degrees) {
 	return radians;
 }
 function easeInOutCubic(x){
-	return x * x * x;
+	return x * x * x * x * x;
 }
 function linear(x){
 	return x ;
@@ -570,9 +712,40 @@ function lerp( a, b, alpha ) {
 	var value = b - a;
 	return a + alpha*value;
 }
+function easeOutQuint(x) {
+return 1 - Math.pow(1 - x, 3);
+}
 </script>
-<div class="back">back</div>
-<div class="popup">I propose to go beyond the notion of cosmology; instead, it would be more productive to address what I call cosmotechnics. Let me give you a preliminary definition of cosmotechnics: it is the unification of the cosmos and the moral through technical activities, whether craft-making or art-making. There hasn’t been one or two technics, but many cosmotechnics. What kind of morality, which and whose cosmos, and how to unite them vary from one culture to another according to different dynamics.</div>
+  <div class="dropdown">
+    <label for="options">Select an option:</label>
+    <select id="options" onchange="showDiv()">
+      <option value="option0">Go to Mainpage</option>
+      <option value="option1">Go to Artwork 1</option>
+      <option value="option2">Go to Artwork 2</option>
+      <option value="option3">Go to Artwork 3</option>
+    </select>
+  </div>
+<a href="nav.html"><div class="awork awork1_0">Art Work 1</div></a>
+<a href="nav.html"><div class="awork awork2_0">Art Work 2</div></a>
+<a href="nav.html"><div class="awork awork3_0">Art Work 3</div></a>
+<div class="awork awork1_1">introduction</div>
+<div class="awork awork1_2"><a href="nav.html">awork1_2</a></div>
+<div class="awork awork1_3"><a href="nav.html">awork1_3</a></div>
+<div class="awork awork1_4"><a href="nav.html">awork1_4</a></div>
+<div class="awork awork1_5"><a href="nav.html">awork1_5</a></div>
+<div class="awork awork2_1">introduction</div>
+<div class="awork awork2_2">awork1_2</div>
+<div class="awork awork2_3">awork1_3</div>
+<div class="awork awork2_4">awork1_4</div>
+<div class="awork awork2_5">awork1_5</div>
+<div class="awork awork3_1">introduction</div>
+<div class="awork awork3_2">awork3_2</div>
+<div class="awork awork3_3">awork3_3</div>
+<div class="awork awork3_4">awork3_4</div>
+<div class="awork awork3_5">awork3_5</div>
+<div class="popup"><img src="img/close.png" class="close">I propose to go beyond the notion of cosmology; instead, it would be more productive to address what I call cosmotechnics. Let me give you a preliminary definition of cosmotechnics: it is the unification of the cosmos and the moral through technical activities, whether craft-making or art-making. There hasn’t been one or two technics, but many cosmotechnics. What kind of morality, which and whose cosmos, and how to unite them vary from one culture to another according to different dynamics.</div>
 
+<div class="extra extra_1">Privacy policy</div>
+<div class="extra extra_2">Credit</div>
 	</body>
 </html>
